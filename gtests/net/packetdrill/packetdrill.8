@@ -1,0 +1,244 @@
+.\" Copyright (c) 2017 George V. Neville-Neil
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.Dd January 25, 2017
+.Dt packetdrill 8
+.Os
+.Sh NAME
+.Nm packetdrill
+.Nd "network protocol test program"
+.Sh SYNOPSIS
+.Nm
+.Op Cm --ip_version
+.Op Cm --bind_port
+.Op Cm --code_command
+.Op Cm --code_format
+.Op Cm --code_sockopt
+.Op Cm --connect_port
+.Op Cm --remote_ip
+.Op Cm --local_ip
+.Op Cm --gateway_ip
+.Op Cm --netmask_ip
+.Op Cm --speed
+.Op Cm --mtu
+.Op Cm --init_scripts
+.Op Cm --tolerance_usecs
+.Op Cm --wire_client
+.Op Cm --wire_server
+.Op Cm --wire_server_ip
+.Op Cm --wire_server_port
+.Op Cm --wire_client_dev
+.Op Cm --wire_server_dev
+.Op Cm --tcp_ts_tick_usecs
+.Op Cm --non_fatal
+.Op Cm --dry_run
+.Op Cm --verbose
+.Ar script_path
+.Ar script
+.Sh DESCRIPTION
+The
+.Nm
+program is used to test network protocols, in particular those that
+operate at the transport layer of the network stack, including
+.Li TCP
+and
+.Li SCTP .
+.Pp
+The use of system calls and the sending and receiving of packets is
+controlled through a domain specific language (DSL) which is described
+in
+.Xr packetdrill-lang 5 .
+.Pp
+.Bl -tag -width ".It Cm --tcp_ts_tick_usecs"
+.It Cm --ip_version
+Version of the Internet Protocols to use:
+.Li ipv4
+.Li ipv6
+or
+.Li ipv4-mapped-ipv6 .
+.It Cm --bind_port
+The
+.Nm
+program listens for packets arriving on a socket.  The port on which
+to listen can be overridden with this option.  The default value is
+8080.
+.It Cm --code_command
+.It Cm --code_format
+.It Cm --code_sockopt
+.It Cm --connect_port
+The transport layer port to which packets will be sent.
+The default value is 8080.
+.It Cm --remote_ip
+Internet address to which
+.Nm
+will send packets.
+Defaults to 192.0.2.1 for
+.Li IPv4
+and
+2001:DB8::1/32 for
+.Li IPv6 .
+.It Cm --local_ip
+Internet address from which
+.Nm
+will send packets.
+Defaults to 192.168.0.1 for
+.Li IPv4
+and
+fd3d:fa7b:d17d::1
+for
+.Li IPv6 .
+.It Cm --gateway_ip
+Next hop gateway (router) address to use during testing.
+Defaults to 192.168.0.2 for
+.Li IPv4
+and fd3d:fa7b:d17d::2 for
+.Li IPv6 .
+.It Cm --netmask_ip
+The netmask to use during testing.
+Defaults to 255.255.0.0 for
+.Li IPv4
+and /48 for
+.Li IPv6 .
+.It Cm --speed
+.It Cm --mtu
+Maximum transfer unit for the
+.Xr tun 4
+device.
+Defaults to 1500 bytes.
+.It Cm --init_scripts
+.It Cm --tolerance_usecs
+Set the timing tolerance in microseconds during testing.
+Tests that depend on accurate timing may fail if the timing tolerance
+is set too narrowly.
+Running
+.Nm
+in a virtual machine,
+where timekeeping is normally quite poor,
+is not recommended.
+.It Cm --wire_client
+Run
+.Nm
+as a client directly on top of a network interface rather than using the
+.Xr tun 4
+interface.
+.It Cm --wire_server
+Run
+.Nm
+as a server directly on top of a network interface rather than using the
+.Xr tun 4
+interface.
+.It Cm --wire_server_ip
+The Internet address of the system on which a wire server is running.
+.It Cm --wire_server_port
+The transport protocol port on the wire server.  Defaults to 8081.
+.It Cm --wire_client_dev
+The interface name to use when
+.Nm
+is running as a wire client.
+Defaults to eth0 on Linux.
+.It Cm --wire_server_dev
+The interface name to use when
+.Nm
+is running as a wire server.
+Defaults to eth0 on Linux.
+.It Cm --tcp_ts_tick_usecs
+Enable or disable checks of the outbound
+.Li TCP
+time-stamp values.
+Defaults to off due to bugs in the Linux
+.Li TCP
+stack.
+.It Cm --non_fatal
+Specify that certain types of operations proceed even if they fail.
+The two options are
+.It packet
+and
+.It syscall
+so that errors from packets or system calls are non-fatal.
+.It Cm --dry_run
+Check for syntax or other errors in the script,
+but do not execute it.
+.It Cm --verbose
+Turn on verbose output.
+.El
+.Pp
+.Nm
+uses the
+.Xr tun 4 ,
+interface to carry out its tests.
+The
+.Li IP
+related options set the IPv4 or IPv6 addresses to use during a test.
+.Pp
+.Bl
+.Li IPv4
+defaults:
+.Fl Cm --remote_ip=192.0.2.1/24
+.Fl Cm --local_ip=192.168.0.1
+.Fl Cm --gateway_ip=192.168.0.2
+.Fl Cm --netmask_ip=255.255.0.0
+.El
+.Sh EXIT STATUS
+.Ex -std
+.Sh EXAMPLES
+The following is an example of a typical usage
+of the
+.Nm
+command:
+.Pp
+.Dl "packetdrill test-file.pkt"
+.Sh DIAGNOSTICS
+The command may fail for many reasons, most of which have to do with
+mismatches between what the test script expects and what the state of
+the underlying system actually is.
+To understand the output of the tests you will need to be well versed
+in operating systems and networking.
+Here there be dragons.
+.Sh SEE ALSO
+.Xr packetdrill-script 5 ,
+.Xr tun 4
+.Rs
+.%A "N. Cardwell"
+.%A "Y. Cheng"
+.%A "L. Brakmo"
+.%A "M. Mathis"
+.%A "B. Raghavan"
+.%A "N. Dukkipati"
+.%A "H. J. Chu"
+.%A "A. Terzis"
+.%A "T. Herbert"
+.%T "packetdrill: Scriptable Network Stack Testing, from Sockets to Packets"
+.Re
+.Sh HISTORY
+The
+.Nm
+manual page first appeared on
+.Pp
+.Sh AUTHORS
+This
+manual page was written by
+.An George V. Neville-Neil Aq Mt gnn@FreeBSD.org .
+.Sh BUGS
+Should be found and fixed after running
+.Nm
