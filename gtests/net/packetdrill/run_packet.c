@@ -109,13 +109,12 @@ static void add_packet_dump(char **error, const char *type,
 		char *old_error = *error;
 		char *dump = NULL, *dump_error = NULL;
 
-		packet_to_string(packet, format,
-				 &dump, &dump_error);
-		asprintf(error, "%s\n%s packet: %9.6f %s%s%s",
-			 old_error, type, usecs_to_secs(time_usecs), dump,
-			 dump_error ? "\n" : "",
-			 dump_error ? dump_error : "");
-
+		if (packet_to_string(packet, format, &dump, &dump_error) == STATUS_OK) {
+			asprintf(error, "%s\n%s packet: %9.6f %s%s%s",
+				 old_error, type, usecs_to_secs(time_usecs), dump,
+				 dump_error ? "\n" : "",
+				 dump_error ? dump_error : "");
+		}
 		free(dump);
 		free(dump_error);
 		free(old_error);
@@ -129,14 +128,12 @@ static void verbose_packet_dump(struct state *state, const char *type,
 	if (state->config->verbose) {
 		char *dump = NULL, *dump_error = NULL;
 
-		packet_to_string(live_packet, DUMP_SHORT,
-				 &dump, &dump_error);
-
-		printf("%s packet: %9.6f %s%s%s\n",
-		       type, usecs_to_secs(time_usecs), dump,
-		       dump_error ? "\n" : "",
-		       dump_error ? dump_error : "");
-
+		if (packet_to_string(live_packet, DUMP_SHORT,  &dump, &dump_error) == STATUS_OK) {
+			printf("%s packet: %9.6f %s%s%s\n",
+			       type, usecs_to_secs(time_usecs), dump,
+			       dump_error ? "\n" : "",
+			       dump_error ? dump_error : "");
+		}
 		free(dump);
 		free(dump_error);
 	}
@@ -1423,7 +1420,7 @@ static int verify_ipv6(
 			return STATUS_ERR;
 		break;
 	case IPPROTO_UDP:
-		if (udp_encaps != 0) {
+		if (udp_encaps == IPPROTO_TCP) {
 			if (check_field("ipv6_payload_len",
 					(ntohs(script_ipv6->payload_len) +
 					 tcp_options_allowance(actual_packet,
@@ -1433,7 +1430,8 @@ static int verify_ipv6(
 			break;
 		} else if (udp_encaps == IPPROTO_SCTP) {
 			break;
-		}
+		} else
+			break;
 	default:
 		if (check_field("ipv6_payload_len",
 				ntohs(script_ipv6->payload_len),

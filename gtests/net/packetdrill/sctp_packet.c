@@ -1001,10 +1001,12 @@ sctp_heartbeat_chunk_new(s64 flgs, struct sctp_parameter_list_item *info)
 		chunk->flags = (u8)flgs;
 	}
 	chunk->length = htons(chunk_length);
-	memcpy(chunk->value, info->parameter, info->length);
-	memset(chunk->value + info->length, 0, padding_length);
-	free(info->parameter);
-	free(info);
+	if (info != NULL) {
+		memcpy(chunk->value, info->parameter, info->length);
+		memset(chunk->value + info->length, 0, padding_length);
+		free(info->parameter);
+		free(info);
+	}
 	return sctp_chunk_list_item_new((struct sctp_chunk *)chunk,
 	                                chunk_length + padding_length,
 	                                flags, sctp_parameter_list_new(),
@@ -1048,10 +1050,12 @@ sctp_heartbeat_ack_chunk_new(s64 flgs, struct sctp_parameter_list_item *info)
 		chunk->flags = (u8)flgs;
 	}
 	chunk->length = htons(chunk_length);
-	memcpy(chunk->value, info->parameter, info->length);
-	memset(chunk->value + info->length, 0, padding_length);
-	free(info->parameter);
-	free(info);
+	if (info != NULL) {
+		memcpy(chunk->value, info->parameter, info->length);
+		memset(chunk->value + info->length, 0, padding_length);
+		free(info->parameter);
+		free(info);
+	}
 	return sctp_chunk_list_item_new((struct sctp_chunk *)chunk,
 	                                chunk_length + padding_length,
 	                                flags, sctp_parameter_list_new(),
@@ -2064,8 +2068,8 @@ sctp_supported_extensions_parameter_new(struct sctp_byte_list *list)
 			parameter->chunk_type[i] = item->byte;
 		}
 		assert((i == list->nr_entries) && (item == NULL));
+		memset(parameter->chunk_type + list->nr_entries, 0, padding_length);
 	}
-	memset(parameter->chunk_type + list->nr_entries, 0, padding_length);
 	return sctp_parameter_list_item_new((struct sctp_parameter *)parameter,
 	                                    parameter_length, flags);
 }
@@ -2259,7 +2263,7 @@ sctp_reconfig_response_parameter_new(s64 respsn, s64 result, s64 sender_next_tsn
 	if (receiver_next_tsn == -1) {
 		flags |= FLAG_RECONFIG_RECEIVER_NEXT_TSN_NOCHECK;
 		parameter->receiver_next_tsn = 0;
-	} else if (sender_next_tsn != -2) {
+	} else if (receiver_next_tsn != -2) {
 		parameter->receiver_next_tsn = htonl((u32)receiver_next_tsn);
 	}
 
@@ -2596,17 +2600,19 @@ sctp_missing_mandatory_parameter_cause_new(struct sctp_parameter_type_list *list
 	assert(cause != NULL);
 	cause->code = htons(SCTP_MISSING_MANDATORY_PARAMETER_CAUSE_CODE);
 	cause->length = htons(cause_length);
-	cause->nr_parameters = htonl(list->nr_entries);
 	if (list != NULL) {
+		cause->nr_parameters = htonl(list->nr_entries);
 		for (i = 0, item = list->first;
 		     (i < list->nr_entries) && (item != NULL);
 		     i++, item = item->next) {
 			cause->parameter_type[i] = htons(item->parameter_type);
 		}
 		assert((i == list->nr_entries) && (item == NULL));
+	} else {
+		cause->nr_parameters = htonl(0);
 	}
 	if (padding_length == 2) {
-		cause->parameter_type[list->nr_entries] = htons(0);
+		cause->parameter_type[i] = htons(0);
 	}
 	return sctp_cause_list_item_new((struct sctp_cause *)cause,
 	                                cause_length, flags);
@@ -2684,9 +2690,9 @@ sctp_unresolvable_address_cause_new(struct sctp_parameter_list_item *item)
 			flags |= FLAG_CAUSE_LENGTH_NOCHECK;
 		}
 		memcpy(cause->parameter, item->parameter, item->length);
+		memset(cause->parameter + item->length, 0, padding_length);
+		free(item);
 	}
-	memset(cause->parameter + item->length, 0, padding_length);
-	free(item);
 	return sctp_cause_list_item_new((struct sctp_cause *)cause,
 	                                length, flags);
 }
@@ -2727,9 +2733,9 @@ sctp_unrecognized_chunk_type_cause_new(struct sctp_chunk_list_item *item)
 			flags |= FLAG_CAUSE_LENGTH_NOCHECK;
 		}
 		memcpy(cause->chunk, item->chunk, item->length);
+		memset(cause->chunk + item->length, 0, padding_length);
+		free(item);
 	}
-	memset(cause->chunk + item->length, 0, padding_length);
-	free(item);
 	return sctp_cause_list_item_new((struct sctp_cause *)cause,
 	                                length, flags);
 }
@@ -3121,6 +3127,7 @@ new_sctp_packet(int address_family,
 							 "number_of_new_streams value must be specified for inbound packets");
 						return NULL;
 					}
+					break;
 				case SCTP_ADD_INCOMING_STREAMS_REQUEST_PARAMETER_TYPE:
 					if (parameter_item->flags & FLAG_RECONFIG_REQ_SN_NOCHECK) {
 						asprintf(error,
@@ -3132,6 +3139,7 @@ new_sctp_packet(int address_family,
 							 "number_of_new_streams value must be specified for inbound packets");
 						return NULL;
 					}
+					break;
 				default:
 					break;
 				}
@@ -3494,7 +3502,6 @@ new_sctp_generic_packet(int address_family,
 	const int sctp_header_bytes = sizeof(struct sctp_common_header);
 	const int sctp_chunk_bytes = bytes->nr_entries;
 	int ip_bytes;
-	bool overbook = false;
 	bool encapsulate = (udp_src_port > 0) || (udp_dst_port > 0);
 	u16 i;
 
@@ -3528,8 +3535,8 @@ new_sctp_generic_packet(int address_family,
 	}
 
 	/* Allocate and zero out a packet object of the desired size */
-	packet = packet_new(overbook ? MAX_SCTP_DATAGRAM_BYTES : ip_bytes);
-	memset(packet->buffer, 0, overbook ? MAX_SCTP_DATAGRAM_BYTES : ip_bytes);
+	packet = packet_new(ip_bytes);
+	memset(packet->buffer, 0, ip_bytes);
 
 	packet->direction = direction;
 	packet->flags = FLAGS_SCTP_GENERIC_PACKET;
