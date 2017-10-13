@@ -902,8 +902,12 @@ static int sctp_unrecognized_parameters_cause_to_string(
 	     parameter = sctp_parameters_next(&iter, error)) {
 		if (index > 0)
 			fputs(", ", s);
-		if (*error != NULL)
+		if (*error != NULL) {
+			fputs(*error, s);
+			free(*error);
+			*error = NULL;
 			break;
+		}
 		result = sctp_parameter_to_string(s, parameter, error);
 		if (result != STATUS_OK)
 			break;
@@ -977,8 +981,12 @@ static int sctp_restart_with_new_addresses_cause_to_string(
 	     parameter = sctp_parameters_next(&iter, error)) {
 		if (index > 0)
 			fputs(", ", s);
-		if (*error != NULL)
+		if (*error != NULL) {
+			fputs(*error, s);
+			free(*error);
+			*error = NULL;
 			break;
+		}
 		result = sctp_parameter_to_string(s, parameter, error);
 		if (result != STATUS_OK)
 			break;
@@ -1190,8 +1198,12 @@ static int sctp_init_chunk_to_string(FILE *s,
 	     parameter != NULL;
 	     parameter = sctp_parameters_next(&iter, error)) {
 		fputs(", ", s);
-		if (*error != NULL)
+		if (*error != NULL) {
+			fputs(*error, s);
+			free(*error);
+			*error = NULL;
 			break;
+		}
 		result = sctp_parameter_to_string(s, parameter, error);
 		if (result != STATUS_OK)
 			break;
@@ -1231,8 +1243,12 @@ static int sctp_init_ack_chunk_to_string(FILE *s,
 	     parameter != NULL;
 	     parameter = sctp_parameters_next(&iter, error)) {
 		fputs(", ", s);
-		if (*error != NULL)
+		if (*error != NULL) {
+			fputs(*error, s);
+			free(*error);
+			*error = NULL;
 			break;
+		}
 		result = sctp_parameter_to_string(s, parameter, error);
 		if (result != STATUS_OK)
 			break;
@@ -1405,7 +1421,7 @@ static int sctp_abort_chunk_to_string(FILE *s,
 {
 	struct sctp_causes_iterator iter;
 	struct sctp_cause *cause;
-	u16 length, index;
+	u16 length;
 	u8 flags;
 	int result = STATUS_OK;
 
@@ -1422,19 +1438,21 @@ static int sctp_abort_chunk_to_string(FILE *s,
 	else
 		if (flags & SCTP_ABORT_CHUNK_T_BIT)
 			fputc('T', s);
-	index = 0;
 	for (cause = sctp_causes_begin((struct sctp_chunk *)chunk,
 				       SCTP_ABORT_CHUNK_CAUSE_OFFSET,
 				       &iter, error);
 	     cause != NULL;
 	     cause = sctp_causes_next(&iter, error)) {
 		fputs(", ", s);
-		if (*error != NULL)
+		if (*error != NULL) {
+			fputs(*error, s);
+			free(*error);
+			*error = NULL;
 			break;
+		}
 		result = sctp_cause_to_string(s, cause, error);
 		if (result != STATUS_OK)
 			break;
-		index++;
 	}
 	fputc(']', s);
 	if (*error != NULL)
@@ -1485,7 +1503,7 @@ static int sctp_error_chunk_to_string(FILE *s,
 {
 	struct sctp_causes_iterator iter;
 	struct sctp_cause *cause;
-	u16 length, index;
+	u16 length;
 	int result = STATUS_OK;
 
 	length = ntohs(chunk->length);
@@ -1495,24 +1513,26 @@ static int sctp_error_chunk_to_string(FILE *s,
 	}
 	fputs("ERROR[", s);
 	fprintf(s, "flgs=0x%02x", chunk->flags);
-	index = 0;
 	for (cause = sctp_causes_begin((struct sctp_chunk *)chunk,
 				       SCTP_ERROR_CHUNK_CAUSE_OFFSET,
 				       &iter, error);
 	     cause != NULL;
 	     cause = sctp_causes_next(&iter, error)) {
 		fputs(", ", s);
-		if (*error != NULL)
+		if (*error != NULL) {
+			fputs(*error, s);
+			free(*error);
+			*error = NULL;
 			break;
+		}
 		result = sctp_cause_to_string(s, cause, error);
 		if (result != STATUS_OK)
 			break;
-		index++;
 	}
 	fputc(']', s);
 	if (*error != NULL)
 		result = STATUS_ERR;
-	return STATUS_OK;
+	return result;
 }
 
 static int sctp_cookie_echo_chunk_to_string(
@@ -1698,8 +1718,12 @@ static int sctp_reconfig_chunk_to_string(
 		     parameter != NULL;
 		     parameter = sctp_parameters_next(&iter, error)) {
 			fputs(", ", s);
-			if (*error != NULL)
+			if (*error != NULL) {
+				fputs(*error, s);
+				free(*error);
+				*error = NULL;
 				break;
+			}
 			result = sctp_parameter_to_string(s, parameter, error);
 			if (result != STATUS_OK)
 				break;
