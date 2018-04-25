@@ -1,5 +1,6 @@
 /*
  * Copyright 2013 Google Inc.
+ * Copyright 2018 Michael Tuexen
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,13 +18,13 @@
  * 02110-1301, USA.
  */
 /*
- * Author: ncardwell@google.com (Neal Cardwell)
+ * Author: tuexen@fh-muenster.de (Michael Tuexen)
  *
  * Definitions of strace-style symbols for FreeBSD.
  * Allows us to map from symbolic strings to integers for system call inputs.
  */
 
-#if defined(__FreeBSD__)
+#if defined(__APPLE__)
 
 #include "symbols.h"
 
@@ -57,11 +58,10 @@ struct int_symbol platform_symbols_table[] = {
 	{ SO_OOBINLINE,                     "SO_OOBINLINE"                    },
 	{ SO_REUSEPORT,                     "SO_REUSEPORT"                    },
 	{ SO_TIMESTAMP,                     "SO_TIMESTAMP"                    },
-	{ SO_NOSIGPIPE,                     "SO_NOSIGPIPE"                    },
-	{ SO_ACCEPTFILTER,                  "SO_ACCEPTFILTER"                 },
-	{ SO_BINTIME,                       "SO_BINTIME"                      },
-	{ SO_NO_OFFLOAD,                    "SO_NO_OFFLOAD"                   },
-	{ SO_NO_DDP,                        "SO_NO_DDP"                       },
+	{ SO_TIMESTAMP_MONOTONIC,           "SO_TIMESTAMP_MONOTONIC"          },
+	{ SO_DONTTRUNC,                     "SO_DONTTRUNC"                    },
+	{ SO_WANTMORE,                      "SO_WANTMORE"                     },
+	{ SO_WANTOOBFLAG,                   "SO_WANTOOBFLAG"                  },
 	{ SO_SNDBUF,                        "SO_SNDBUF"                       },
 	{ SO_RCVBUF,                        "SO_RCVBUF"                       },
 	{ SO_SNDLOWAT,                      "SO_SNDLOWAT"                     },
@@ -72,13 +72,16 @@ struct int_symbol platform_symbols_table[] = {
 	{ SO_TYPE,                          "SO_TYPE"                         },
 	{ SO_LABEL,                         "SO_LABEL"                        },
 	{ SO_PEERLABEL,                     "SO_PEERLABEL"                    },
-	{ SO_LISTENQLIMIT,                  "SO_LISTENQLIMIT"                 },
-	{ SO_LISTENQLEN,                    "SO_LISTENQLEN"                   },
-	{ SO_LISTENINCQLEN,                 "SO_LISTENINCQLEN"                },
-	{ SO_SETFIB,                        "SO_SETFIB"                       },
-#ifdef SO_USER_COOKIE
-	{ SO_USER_COOKIE,                   "SO_USER_COOKIE"                  },
-#endif
+	{ SO_NREAD,                         "SO_NREAD"                        },
+	{ SO_NKE,                           "SO_NKE"                          },
+	{ SO_NOSIGPIPE,                     "SO_NOSIGPIPE"                    },
+	{ SO_NOADDRERR,                     "SO_NOADDRERR"                    },
+	{ SO_NWRITE,                        "SO_NWRITE"                       },
+	{ SO_REUSESHAREUID,                 "SO_REUSESHAREUID"                },
+	{ SO_LINGER_SEC,                    "SO_LINGER_SEC"                   },
+	{ SO_RANDOMPORT,                    "SO_RANDOMPORT"                   },
+	{ SO_NP_EXTENSIONS,                 "SO_NP_EXTENSIONS"                },
+	{ SO_NUMRCVPKT,                     "SO_NUMRCVPKT"                    },
 
 	/* /usr/include/netinet/in.h */
 	{ IP_OPTIONS,                       "IP_OPTIONS"                      },
@@ -88,38 +91,31 @@ struct int_symbol platform_symbols_table[] = {
 	{ IP_RECVOPTS,                      "IP_RECVOPTS"                     },
 	{ IP_RECVRETOPTS,                   "IP_RECVRETOPTS"                  },
 	{ IP_RECVDSTADDR,                   "IP_RECVDSTADDR"                  },
-	{ IP_SENDSRCADDR,                   "IP_SENDSRCADDR"                  },
 	{ IP_RETOPTS,                       "IP_RETOPTS"                      },
 	{ IP_PORTRANGE,                     "IP_PORTRANGE"                    },
 	{ IP_RECVIF,                        "IP_RECVIF"                       },
-#ifdef IP_RSS_LISTEN_BUCKET
-	{ IP_RSS_LISTEN_BUCKET,             "IP_RSS_LISTEN_BUCKET"            },
-#endif
 	{ IP_RECVTTL,                       "IP_RECVTTL"                      },
-	{ IP_MINTTL,                        "IP_MINTTL,"                      },
-	{ IP_DONTFRAG,                      "IP_DONTFRAG"                     },
+	{ IP_PKTINFO,                       "IP_PKTINFO,"                     },
+	{ IP_RECVPKTINFO,                   "IP_RECVPKTINFO"                  },
 	{ IP_RECVTOS,                       "IP_RECVTOS"                      },
-#ifdef IP_FLOWID
-	{ IP_FLOWID,                        "IP_FLOWID"                       },
-#endif
-#ifdef IP_FLOWTYPE
-	{ IP_FLOWTYPE,                      "IP_FLOWTYPE"                     },
-#endif
-#ifdef IP_RSSBUCKETID
-	{ IP_RSSBUCKETID,                   "IP_RSSBUCKETID"                  },
-#endif
-#ifdef IP_RECVFLOWID
-	{ IP_RECVFLOWID,                    "IP_RECVFLOWID"                   },
-#endif
-#ifdef IP_RECVRSSBUCKETID
-	{ IP_RECVRSSBUCKETID,               "IP_RECVRSSBUCKETID"              },
-#endif
 
 	/* /usr/include/netinet6/in6.h */
 	{ IPV6_UNICAST_HOPS,                "IPV6_UNICAST_HOPS"               },
 	{ IPV6_PORTRANGE,                   "IPV6_PORTRANGE"                  },
+	{ ICMP6_FILTER,                     "ICMP6_FILTER"                    },
+	{ IPV6_2292PKTINFO,                 "IPV6_2292PKTINFO"                },
+	{ IPV6_2292HOPLIMIT,                "IPV6_2292HOPLIMIT"               },
+	{ IPV6_2292NEXTHOP,                 "IPV6_2292NEXTHOP"                },
+	{ IPV6_2292HOPOPTS,                 "IPV6_2292HOPOPTS"                },
+	{ IPV6_2292DSTOPTS,                 "IPV6_2292DSTOPTS"                },
+	{ IPV6_2292RTHDR,                   "IPV6_2292RTHDR"                  },
+	{ IPV6_2292PKTOPTIONS,              "IPV6_2292PKTOPTIONS"             },
 	{ IPV6_CHECKSUM,                    "IPV6_CHECKSUM"                   },
 	{ IPV6_V6ONLY,                      "IPV6_V6ONLY"                     },
+	{ IPV6_BINDV6ONLY,                  "IPV6_BINDV6ONLY"                 },
+	{ IPV6_RECVTCLASS,                  "IPV6_RECVTCLASS"                 },
+	{ IPV6_TCLASS,                      "IPV6_TCLASS"                     },
+	{ IPV6_RTHDRDSTOPTS,                "IPV6_RTHDRDSTOPTS"               },
 	{ IPV6_RECVPKTINFO,                 "IPV6_RECVPKTINFO"                },
 	{ IPV6_RECVHOPLIMIT,                "IPV6_RECVHOPLIMIT"               },
 	{ IPV6_RECVRTHDR,                   "IPV6_RECVRTHDR"                  },
@@ -128,30 +124,24 @@ struct int_symbol platform_symbols_table[] = {
 	{ IPV6_USE_MIN_MTU,                 "IPV6_USE_MIN_MTU"                },
 	{ IPV6_RECVPATHMTU,                 "IPV6_RECVPATHMTU"                },
 	{ IPV6_PATHMTU,                     "IPV6_PATHMTU"                    },
+	{ IPV6_3542PKTINFO,                 "IPV6_3542PKTINFO"                },
+	{ IPV6_3542HOPLIMIT,                "IPV6_3542HOPLIMIT"               },
+	{ IPV6_3542NEXTHOP,                 "IPV6_3542NEXTHOP"                },
+	{ IPV6_3542HOPOPTS,                 "IPV6_3542HOPOPTS"                },
+	{ IPV6_3542DSTOPTS,                 "IPV6_3542DSTOPTS"                },
+	{ IPV6_3542RTHDR,                   "IPV6_3542RTHDR"                  },
+	{ IPV6_PKTINFO,                     "IPV6_PKTINFO"                    },
 	{ IPV6_HOPLIMIT,                    "IPV6_HOPLIMIT"                   },
-	{ IPV6_RECVTCLASS,                  "IPV6_RECVTCLASS"                 },
+	{ IPV6_NEXTHOP,                     "IPV6_NEXTHOP"                    },
+	{ IPV6_HOPOPTS,                     "IPV6_HOPOPTS"                    },
+	{ IPV6_DSTOPTS,                     "IPV6_DSTOPTS"                    },
+	{ IPV6_RTHDR,                       "IPV6_RTHDR"                      },
 	{ IPV6_AUTOFLOWLABEL,               "IPV6_AUTOFLOWLABEL"              },
-	{ IPV6_TCLASS,                      "IPV6_TCLASS"                     },
 	{ IPV6_DONTFRAG,                    "IPV6_DONTFRAG"                   },
-#ifdef IPV6_RSS_LISTEN_BUCKET
-	{ IPV6_RSS_LISTEN_BUCKET,           "IPV6_RSS_LISTEN_BUCKET"          },
-#endif
-#ifdef IPV6_FLOWID
-	{ IPV6_FLOWID,                      "IPV6_FLOWID"                     },
-#endif
-#ifdef IPV6_FLOWTYPE
-	{ IPV6_FLOWTYPE,                    "IPV6_FLOWTYPE"                   },
-#endif
-#ifdef IPV6_RSSBUCKETID
-	{ IPV6_RSSBUCKETID,                 "IPV6_RSSBUCKETID"                },
-#endif
-#ifdef IPV6_RECVFLOWID
-	{ IPV6_RECVFLOWID,                  "IPV6_RECVFLOWID"                 },
-#endif
-#ifdef IPV6_RECVRSSBUCKETID
-	{ IPV6_RECVRSSBUCKETID,             "IPV6_RECVRSSBUCKETID"            },
-#endif
+	{ IPV6_PREFER_TEMPADDR,             "IPV6_PREFER_TEMPADDR"            },
+	{ IPV6_BOUND_IF,                    "IPV6_BOUND_IF"                   },
 
+#if defined(HAVE_SCTP)
 	/* /usr/include/netinet/sctp.h and /usr/include/netinet/sctp_uio.h */
 	{ SCTP_RTOINFO,                     "SCTP_RTOINFO"                    },
 	{ SCTP_ASSOCINFO,                   "SCTP_ASSOCINFO"                  },
@@ -360,40 +350,25 @@ struct int_symbol platform_symbols_table[] = {
 	{ SCTP_STREAM_CHANGE_EVENT,         "SCTP_STREAM_CHANGE_EVENT"        },
 	{ SCTP_STREAM_CHANGE_DENIED,        "SCTP_STREAM_CHANGE_DENIED"       },
 	{ SCTP_STREAM_CHANGE_FAILED,        "SCTP_STREAM_CHANGE_FAILED"       },
+#endif
 
 	/* /usr/include/netinet/tcp.h */
 	{ TCP_NODELAY,                      "TCP_NODELAY"                     },
 	{ TCP_MAXSEG,                       "TCP_MAXSEG"                      },
 	{ TCP_NOPUSH,                       "TCP_NOPUSH"                      },
 	{ TCP_NOOPT,                        "TCP_NOOPT"                       },
-	{ TCP_MD5SIG,                       "TCP_MD5SIG"                      },
-	{ TCP_INFO,                         "TCP_INFO"                        },
-	{ TCP_CONGESTION,                   "TCP_CONGESTION"                  },
-#if defined(TCP_CCALGOOPT)
-	{ TCP_CCALGOOPT,                    "TCP_CCALGOOPT"                   },
-#endif
-	{ TCP_KEEPINIT,                     "TCP_KEEPINIT"                    },
-	{ TCP_KEEPIDLE,                     "TCP_KEEPIDLE"                    },
+	{ TCP_KEEPALIVE,                    "TCP_KEEPALIVE"                   },
+	{ TCP_CONNECTIONTIMEOUT,            "TCP_CONNECTIONTIMEOUT"           },
+	{ PERSIST_TIMEOUT,                  "PERSIST_TIMEOUT"                 },
+	{ TCP_RXT_CONNDROPTIME,             "TCP_RXT_CONNDROPTIME"            },
+	{ TCP_RXT_FINDROP,                  "TCP_RXT_FINDROP"                 },
 	{ TCP_KEEPINTVL,                    "TCP_KEEPINTVL"                   },
 	{ TCP_KEEPCNT,                      "TCP_KEEPCNT"                     },
-#if defined(TCP_FASTOPEN)
+	{ TCP_SENDMOREACKS,                 "TCP_SENDMOREACKS"                },
+	{ TCP_ENABLE_ECN,                   "TCP_ENABLE_ECN"                  },
 	{ TCP_FASTOPEN,                     "TCP_FASTOPEN"                    },
-#endif
-#if defined(TCP_FUNCTION_BLK)
-	{ TCP_FUNCTION_BLK,                 "TCP_FUNCTION_BLK"                },
-#endif
-#if defined(TCP_REMOTE_UDP_ENCAPS_PORT)
-	{ TCP_REMOTE_UDP_ENCAPS_PORT,       "TCP_REMOTE_UDP_ENCAPS_PORT"      },
-#endif
-#if defined(TCP_LOG)
-	{ TCP_LOG,                          "TCP_LOG"                         },
-#endif
-
-#if defined(UDPLITE_RECV_CSCOV) && defined(UDPLITE_SEND_CSCOV)
-	/* /usr/include/netinet/udplite.h */
-	{ UDPLITE_RECV_CSCOV,               "UDPLITE_RECV_CSCOV"              },
-	{ UDPLITE_SEND_CSCOV,               "UDPLITE_SEND_CSCOV"              },
-#endif
+	{ TCP_CONNECTION_INFO,              "TCP_CONNECTION_INFO"             },
+	{ TCP_NOTSENT_LOWAT,                "TCP_NOTSENT_LOWAT"               },
 
 	/* /usr/include/sys/fcntl.h */
 	{ O_RDONLY,                         "O_RDONLY"                        },
@@ -408,29 +383,31 @@ struct int_symbol platform_symbols_table[] = {
 	{ O_EXLOCK,                         "O_EXLOCK"                        },
 	{ O_ASYNC,                          "O_ASYNC"                         },
 	{ O_FSYNC,                          "O_FSYNC"                         },
-	{ O_SYNC,                           "O_SYNC"                          },
 	{ O_NOFOLLOW,                       "O_NOFOLLOW"                      },
 	{ O_CREAT,                          "O_CREAT"                         },
 	{ O_TRUNC,                          "O_TRUNC"                         },
 	{ O_EXCL,                           "O_EXCL"                          },
-	{ O_NOCTTY,                         "O_NOCTTY"                        },
-	{ O_DIRECT,                         "O_DIRECT"                        },
-	{ O_DIRECTORY,                      "O_DIRECTORY"                     },
-	{ O_EXEC,                           "O_EXEC"                          },
-	{ O_TTY_INIT,                       "O_TTY_INIT"                      },
-	{ O_CLOEXEC,                        "O_CLOEXEC"                       },
-	{ FAPPEND,                          "FAPPEND"                         },
-	{ FASYNC,                           "FASYNC"                          },
-	{ FFSYNC,                           "FFSYNC"                          },
-	{ FNONBLOCK,                        "FNONBLOCK"                       },
-	{ FNDELAY,                          "FNDELAY"                         },
-	{ O_NDELAY,                         "O_NDELAY"                        },
-	{ FRDAHEAD,                         "FRDAHEAD"                        },
 	{ AT_FDCWD,                         "AT_FDCWD"                        },
 	{ AT_EACCESS,                       "AT_EACCESS"                      },
 	{ AT_SYMLINK_NOFOLLOW,              "AT_SYMLINK_NOFOLLOW"             },
 	{ AT_SYMLINK_FOLLOW,                "AT_SYMLINK_FOLLOW"               },
 	{ AT_REMOVEDIR,                     "AT_REMOVEDIR"                    },
+	{ O_EVTONLY,                        "O_EVTONLY"                       },
+	{ O_NOCTTY,                         "O_NOCTTY"                        },
+	{ O_DIRECTORY,                      "O_DIRECTORY"                     },
+	{ O_SYMLINK,                        "O_SYMLINK"                       },
+	{ O_CLOEXEC,                        "O_CLOEXEC"                       },
+	{ O_DP_GETRAWENCRYPTED,             "O_DP_GETRAWENCRYPTED"            },
+	{ O_DP_GETRAWUNENCRYPTED,           "O_DP_GETRAWUNENCRYPTED"          },
+	{ FAPPEND,                          "FAPPEND"                         },
+	{ FASYNC,                           "FASYNC"                          },
+	{ FFSYNC,                           "FFSYNC"                          },
+	{ FFDSYNC,                          "FFDSYNC"                         },
+	{ FNONBLOCK,                        "FNONBLOCK"                       },
+	{ FNDELAY,                          "FNDELAY"                         },
+	{ O_NDELAY,                         "O_NDELAY"                        },
+	{ CPF_OVERWRITE,                    "CPF_OVERWRITE"                   },
+	{ CPF_IGNORE_MODE,                  "CPF_IGNORE_MODE"                 },
 	{ F_DUPFD,                          "F_DUPFD"                         },
 	{ F_GETFD,                          "F_GETFD"                         },
 	{ F_SETFD,                          "F_SETFD"                         },
@@ -438,32 +415,56 @@ struct int_symbol platform_symbols_table[] = {
 	{ F_SETFL,                          "F_SETFL"                         },
 	{ F_GETOWN,                         "F_GETOWN"                        },
 	{ F_SETOWN,                         "F_SETOWN"                        },
-	{ F_OGETLK,                         "F_OGETLK"                        },
-	{ F_OSETLK,                         "F_OSETLK"                        },
-	{ F_OSETLKW,                        "F_OSETLKW"                       },
-	{ F_DUP2FD,                         "F_DUP2FD"                        },
 	{ F_GETLK,                          "F_GETLK"                         },
 	{ F_SETLK,                          "F_SETLK"                         },
 	{ F_SETLKW,                         "F_SETLKW"                        },
-	{ F_SETLK_REMOTE,                   "F_SETLK_REMOTE"                  },
-	{ F_READAHEAD,                      "F_READAHEAD"                     },
+	{ F_SETLKWTIMEOUT,                  "F_SETLKWTIMEOUT"                 },
+	{ F_FLUSH_DATA,                     "F_FLUSH_DATA"                    },
+	{ F_CHKCLEAN,                       "F_CHKCLEAN"                      },
+	{ F_PREALLOCATE,                    "F_PREALLOCATE"                   },
+	{ F_SETSIZE,                        "F_SETSIZE"                       },
+	{ F_RDADVISE,                       "F_RDADVISE"                      },
 	{ F_RDAHEAD,                        "F_RDAHEAD"                       },
+	{ F_NOCACHE,                        "F_NOCACHE"                       },
+	{ F_LOG2PHYS,                       "F_LOG2PHYS"                      },
+	{ F_GETPATH,                        "F_GETPATH"                       },
+	{ F_FULLFSYNC,                      "F_FULLFSYNC"                     },
+	{ F_PATHPKG_CHECK,                  "F_PATHPKG_CHECK"                 },
+	{ F_FREEZE_FS,                      "F_FREEZE_FS"                     },
+	{ F_THAW_FS,                        "F_THAW_FS"                       },
+	{ F_GLOBAL_NOCACHE,                 "F_GLOBAL_NOCACHE"                },
+	{ F_ADDSIGS,                        "F_ADDSIGS"                       },
+	{ F_ADDFILESIGS,                    "F_ADDFILESIGS"                   },
+	{ F_NODIRECT,                       "F_NODIRECT"                      },
+	{ F_GETPROTECTIONCLASS,             "F_GETPROTECTIONCLASS"            },
+	{ F_SETPROTECTIONCLASS,             "F_SETPROTECTIONCLASS"            },
+	{ F_LOG2PHYS_EXT,                   "F_LOG2PHYS_EXT"                  },
+	{ F_GETLKPID,                       "F_GETLKPID"                      },
+	{ F_SETBACKINGSTORE,                "F_SETBACKINGSTORE"               },
+	{ F_GETPATH_MTMINFO,                "F_GETPATH_MTMINFO"               },
+	{ F_GETCODEDIR,                     "F_GETCODEDIR"                    },
+	{ F_SETNOSIGPIPE,                   "F_SETNOSIGPIPE"                  },
+	{ F_GETNOSIGPIPE,                   "F_GETNOSIGPIPE"                  },
+	{ F_TRANSCODEKEY,                   "F_TRANSCODEKEY"                  },
+	{ F_SINGLE_WRITER,                  "F_SINGLE_WRITER"                 },
+	{ F_GETPROTECTIONLEVEL,             "F_GETPROTECTIONLEVEL"            },
+	{ F_FINDSIGS,                       "F_FINDSIGS"                      },
+	{ F_ADDFILESIGS_FOR_DYLD_SIM,       "F_ADDFILESIGS_FOR_DYLD_SIM"      },
+	{ F_BARRIERFSYNC,                   "F_BARRIERFSYNC"                  },
+	{ F_ADDFILESIGS_RETURN,             "F_ADDFILESIGS_RETURN"            },
+	{ F_CHECK_LV,                       "F_CHECK_LV"                      },
+	{ F_PUNCHHOLE,                      "F_PUNCHHOLE"                     },
+	{ F_TRIM_ACTIVE_FILE,               "F_TRIM_ACTIVE_FILE"              },
+	{ FCNTL_FS_SPECIFIC_BASE,           "F_UFCNTL_FS_SPECIFIC_BASENLCK"   },
+	{ F_DUPFD_CLOEXEC,                  "F_DUPFD_CLOEXEC"                 },
 	{ FD_CLOEXEC,                       "FD_CLOEXEC"                      },
 	{ F_RDLCK,                          "F_RDLCK"                         },
 	{ F_UNLCK,                          "F_UNLCK"                         },
 	{ F_WRLCK,                          "F_WRLCK"                         },
-	{ F_UNLCKSYS,                       "F_UNLCKSYS"                      },
-	{ F_CANCEL,                         "F_CANCEL"                        },
-	{ LOCK_SH,                          "LOCK_SH"                         },
-	{ LOCK_EX,                          "LOCK_EX"                         },
-	{ LOCK_NB,                          "LOCK_NB"                         },
-	{ LOCK_UN,                          "LOCK_UN"                         },
-	{ SF_NODISKIO,                      "SF_NODISKIO"                     },
-	{ SF_MNOWAIT,                       "SF_MNOWAIT"                      },
-#ifdef SF_NOCACHE
-	{ SF_NOCACHE,                       "SF_NOCACHE"                      },
-#endif
-	{ SF_SYNC,                          "SF_SYNC"                         },
+	{ F_ALLOCATECONTIG,                 "F_ALLOCATECONTIG"                },
+	{ F_ALLOCATEALL,                    "F_ALLOCATEALL"                   },
+	{ F_PEOFPOSMODE,                    "F_PEOFPOSMODE"                   },
+	{ F_VOLPOSMODE,                     "F_VOLPOSMODE"                    },
 
 	/* /usr/include/sys/unistd.h */
 	{ SEEK_SET,                         "SEEK_SET"                        },
@@ -478,12 +479,14 @@ struct int_symbol platform_symbols_table[] = {
 	{ MSG_TRUNC,                        "MSG_TRUNC"                       },
 	{ MSG_CTRUNC,                       "MSG_CTRUNC"                      },
 	{ MSG_WAITALL,                      "MSG_WAITALL"                     },
-	{ MSG_NOTIFICATION,                 "MSG_NOTIFICATION"                },
 	{ MSG_DONTWAIT,                     "MSG_DONTWAIT"                    },
 	{ MSG_EOF,                          "MSG_EOF"                         },
-	{ MSG_NBIO,                         "MSG_NBIO"                        },
-	{ MSG_COMPAT,                       "MSG_COMPAT"                      },
-	{ MSG_NOSIGNAL,                     "MSG_NOSIGNAL"                    },
+	{ MSG_FLUSH,                        "MSG_FLUSH"                       },
+	{ MSG_HOLD,                         "MSG_HOLD"                        },
+	{ MSG_SEND,                         "MSG_SEND"                        },
+	{ MSG_HAVEMORE,                     "MSG_HAVEMORE"                    },
+	{ MSG_RCVMORE,                      "MSG_RCVMORE"                     },
+	{ MSG_NEEDSA,                       "MSG_NEEDSA"                      },
 
 	/* /usr/include/sys/filio.h */
 	{ FIOCLEX,                          "FIOCLEX"                         },
@@ -494,12 +497,6 @@ struct int_symbol platform_symbols_table[] = {
 	{ FIOSETOWN,                        "FIOSETOWN"                       },
 	{ FIOGETOWN,                        "FIOGETOWN"                       },
 	{ FIODTYPE,                         "FIODTYPE"                        },
-	{ FIOGETLBA,                        "FIOGETLBA"                       },
-	{ FIODGNAME,                        "FIODGNAME"                       },
-	{ FIONWRITE,                        "FIONWRITE"                       },
-	{ FIONSPACE,                        "FIONSPACE"                       },
-	{ FIOSEEKDATA,                      "FIOSEEKDATA"                     },
-	{ FIOSEEKHOLE,                      "FIOSEEKHOLE"                     },
 
 	/* /usr/include/sys/poll.h */
 	{ POLLIN,                           "POLLIN"                          },
@@ -509,7 +506,6 @@ struct int_symbol platform_symbols_table[] = {
 	{ POLLWRNORM,                       "POLLWRNORM"                      },
 	{ POLLRDBAND,                       "POLLRDBAND"                      },
 	{ POLLWRBAND,                       "POLLWRBAND"                      },
-	{ POLLINIGNEOF,                     "POLLINIGNEOF"                    },
 	{ POLLERR,                          "POLLERR"                         },
 	{ POLLHUP,                          "POLLHUP"                         },
 	{ POLLNVAL,                         "POLLNVAL"                        },
@@ -598,21 +594,31 @@ struct int_symbol platform_symbols_table[] = {
 	{ EFTYPE,                           "EFTYPE"                          },
 	{ EAUTH,                            "EAUTH"                           },
 	{ ENEEDAUTH,                        "ENEEDAUTH"                       },
+	{ EPWROFF,                          "EPWROFF"                         },
+	{ EDEVERR,                          "EDEVERR"                         },
+	{ EOVERFLOW,                        "EOVERFLOW"                       },
+	{ EBADEXEC,                         "EBADEXEC"                        },
+	{ EBADARCH,                         "EBADARCH"                        },
+	{ ESHLIBVERS,                       "ESHLIBVERS"                      },
+	{ EBADMACHO,                        "EBADMACHO"                       },
+	{ ECANCELED,                        "ECANCELED"                       },
 	{ EIDRM,                            "EIDRM"                           },
 	{ ENOMSG,                           "ENOMSG"                          },
-	{ EOVERFLOW,                        "EOVERFLOW"                       },
-	{ ECANCELED,                        "ECANCELED"                       },
 	{ EILSEQ,                           "EILSEQ"                          },
 	{ ENOATTR,                          "ENOATTR"                         },
-	{ EDOOFUS,                          "EDOOFUS"                         },
 	{ EBADMSG,                          "EBADMSG"                         },
 	{ EMULTIHOP,                        "EMULTIHOP"                       },
+	{ ENODATA,                          "ENODATA"                         },
 	{ ENOLINK,                          "ENOLINK"                         },
+	{ ENOSR,                            "ENOSR"                           },
+	{ ENOSTR,                           "ENOSTR"                          },
 	{ EPROTO,                           "EPROTO"                          },
-	{ ENOTCAPABLE,                      "ENOTCAPABLE"                     },
-#ifdef ECAPMODE
-	{ ECAPMODE,                         "ECAPMODE"                        },
-#endif
+	{ ETIME,                            "ETIME"                           },
+	{ EOPNOTSUPP,                       "EOPNOTSUPP"                      },
+	{ ENOPOLICY,                        "ENOPOLICY"                       },
+	{ ENOTRECOVERABLE,                  "ENOTRECOVERABLE"                 },
+	{ EOWNERDEAD,                       "EOWNERDEAD"                      },
+	{ EQFULL,                           "EQFULL"                          },
 
 	/* Sentinel marking the end of the table. */
 	{ 0, NULL },
@@ -623,4 +629,4 @@ struct int_symbol *platform_symbols(void)
 	return platform_symbols_table;
 }
 
-#endif  /* __FreeBSD__ */
+#endif  /* __APPLE__ */
