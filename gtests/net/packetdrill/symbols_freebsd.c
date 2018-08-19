@@ -79,6 +79,21 @@ struct int_symbol platform_symbols_table[] = {
 #ifdef SO_USER_COOKIE
 	{ SO_USER_COOKIE,                   "SO_USER_COOKIE"                  },
 #endif
+#ifdef SO_PROTOCOL
+	{ SO_PROTOCOL,                      "SO_PROTOCOL"                     },
+#endif
+#ifdef SO_PROTOTYPE
+	{ SO_PROTOTYPE,                     "SO_PROTOTYPE"                    },
+#endif
+#ifdef SO_TS_CLOCK
+	{ SO_TS_CLOCK,                      "SO_TS_CLOCK"                     },
+#endif
+#ifdef SO_MAX_PACING_RATE
+	{ SO_MAX_PACING_RATE,               "SO_MAX_PACING_RATE"              },
+#endif
+#ifdef SO_DOMAIN
+	{ SO_DOMAIN,                        "SO_DOMAIN"                       },
+#endif
 
 	/* /usr/include/netinet/in.h */
 	{ IP_OPTIONS,                       "IP_OPTIONS"                      },
@@ -371,6 +386,9 @@ struct int_symbol platform_symbols_table[] = {
 	{ TCP_CONGESTION,                   "TCP_CONGESTION"                  },
 #if defined(TCP_CCALGOOPT)
 	{ TCP_CCALGOOPT,                    "TCP_CCALGOOPT"                   },
+#endif
+#if defined(TCP_MAXUNACKTIME)
+	{ TCP_MAXUNACKTIME,                 "TCP_MAXUNACKTIME"                },
 #endif
 	{ TCP_KEEPINIT,                     "TCP_KEEPINIT"                    },
 	{ TCP_KEEPIDLE,                     "TCP_KEEPIDLE"                    },

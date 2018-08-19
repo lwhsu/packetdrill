@@ -24,7 +24,6 @@
 
 #include "packet_socket.h"
 
-#include <assert.h>
 #include <errno.h>
 #include <net/if.h>
 #include <stdlib.h>
@@ -35,12 +34,13 @@
 
 #ifdef USE_LIBPCAP
 
-#if defined(__FreeBSD__) || defined(__APPLE__)
+#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__SunOS_5_11)
 #include <pcap/pcap.h>
 #elif defined(__OpenBSD__) || defined(__NetBSD__)
 #include <pcap.h>
 #endif
 
+#include "assert.h"
 #include "ethernet.h"
 #include "logging.h"
 
@@ -257,7 +257,7 @@ int packet_socket_receive(struct packet_socket *psock,
 	       (u32)pkt_header->ts.tv_sec,
 	       (u32)pkt_header->ts.tv_usec);
 
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__APPLE__)
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__SunOS_5_11)
 	packet->time_usecs = timeval_to_usecs(&pkt_header->ts);
 #elif defined(__OpenBSD__)
 	packet->time_usecs = bpf_timeval_to_usecs(&pkt_header->ts);
@@ -311,9 +311,9 @@ int packet_socket_receive(struct packet_socket *psock,
 		}
 		break;
 	case DLT_RAW:
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 		version = (*pkt_data & 0xf0) >> 4;
-#elif __BYTE_ORDER == __BIG_ENDIAN
+#elif defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 		version = *pkt_data & 0x0f;
 #else
 #error "Please fix endianness defines"

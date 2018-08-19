@@ -1,7 +1,6 @@
 all: binaries
 
-CFLAGS += -g -Wall -Werror -Wno-unknown-warning-option -Wno-address-of-packed-member
-LDFLAGS ?= -static
+CFLAGS += -g
 
 parser.o: parser.y
 	bison --output=parser.c --defines=parser.h --report=state parser.y
@@ -9,7 +8,7 @@ parser.o: parser.y
 
 lexer.o: lexer.l parser.o
 	flex -olexer.c lexer.l
-	$(CC) -O2 -g -Wall -Wno-unknown-warning-option -Wno-address-of-packed-member -c lexer.c
+	$(CC) -O2 $(CFLAGS) -c lexer.c
 
 packetdrill-lib := \
          checksum.o code.o config.o hash.o hash_map.o ip_address.o ip_prefix.o \
@@ -21,6 +20,7 @@ packetdrill-lib := \
          symbols_openbsd.o \
          symbols_netbsd.o \
          symbols_darwin.o \
+         symbols_solaris.o \
          gre_packet.o icmp_packet.o ip_packet.o \
          sctp_packet.o tcp_packet.o udp_packet.o udplite_packet.o \
          mpls_packet.o \
@@ -37,7 +37,7 @@ packetdrill-lib := \
 packetdrill-objs := packetdrill.o $(packetdrill-lib)
 
 packetdrill: $(packetdrill-objs)
-	$(CC) -o packetdrill -g $(LDFLAGS) $(packetdrill-objs) $(packetdrill-ext-libs)
+	$(CC) -o packetdrill -g $(packetdrill-objs) $(packetdrill-ext-libs)
 
 test-bins := checksum_test packet_parser_test packet_to_string_test
 tests: $(test-bins)

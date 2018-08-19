@@ -68,6 +68,27 @@
 #include "open_memstream.h"
 #endif
 
+/*
+ * Very old compilers like gcc 4.2.1 do not define the endian
+ * macros. gcc 4.2.1 is used as the default compiler on
+ * PowerPC and PowerPC64 for FreeBSD. So define the macros
+ * for these platform.
+ */
+
+#if !defined(__ORDER_LITTLE_ENDIAN__)
+#define __ORDER_LITTLE_ENDIAN__ 1234
+#endif
+#if !defined(__ORDER_BIG_ENDIAN__)
+#define __ORDER_BIG_ENDIAN__ 4321
+#endif
+#if !defined(__BYTE_ORDER__)
+#if defined(__PPC__) || defined(__PPC64__)
+#define __BYTE_ORDER__ __ORDER_BIG_ENDIAN__
+#else
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
+#endif
+#endif
+
 #endif  /* __FreeBSD__ */
 
 /* ------------------------- OpenBSD --------------------- */
@@ -124,6 +145,24 @@
 #endif
 
 #endif  /* __APPLE__ */
+
+/* ------------------------- Solaris --------------------- */
+
+#if defined(__SunOS_5_11)
+
+#define IPPROTO_IPIP            IPPROTO_ENCAP
+#define IPPROTO_GRE             47
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/sctp.h>
+#define USE_LIBPCAP             1
+#define TUN_DIR                 "/dev"
+#define HAVE_TCP_INFO           1
+/* open_memstream() and fmemopen() are available in Solaris 11.4 and higher. */
+#define HAVE_FMEMOPEN           1
+#define HAVE_OPEN_MEMSTREAM     1
+
+#endif  /* __SunOS_5_11 */
 
 
 #endif /* __PLATFORMS_H__ */
